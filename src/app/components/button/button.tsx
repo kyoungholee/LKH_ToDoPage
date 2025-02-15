@@ -6,8 +6,8 @@ interface ButtonProps {
 }
 
 export default function Button({ name, onClick }: ButtonProps) {
-  const isDelete = name.includes('삭제');
-  const buttonColor = isDelete ? 'bg-red-500' : 'bg-blue-500';
+  const isDelete = name.includes('할 일');
+  const buttonColor = isDelete ? 'bg-gray-400' : 'bg-blue-500';
 
   return (
     <button
