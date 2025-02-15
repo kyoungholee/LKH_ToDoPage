@@ -1,16 +1,20 @@
 'use client';
 
-interface ButtonPros {
+interface ButtonProps {
   name: string;
   onClick: () => void;
 }
 
-export default function Button({ name, onClick }: ButtonPros) {
+export default function Button({ name, onClick }: ButtonProps) {
+  const isDelete = name.includes('삭제');
+  const buttonColor = isDelete ? 'bg-red-500' : 'bg-blue-500';
+
   return (
-    <>
-      <button className="rounded-md w-5" onClick={onClick}>
-        {name}
-      </button>
-    </>
+    <button
+      onClick={onClick}
+      className={`text-white px-4 py-2 rounded-lg ${buttonColor} transition shadow-md`}
+    >
+      {name}
+    </button>
   );
 }
