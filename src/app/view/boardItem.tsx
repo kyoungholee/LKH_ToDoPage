@@ -1,29 +1,54 @@
 'use client';
 
 import { BoardInfo } from '../typescript/board';
+import { Todo } from '../typescript/todo';
 import { useState } from 'react';
 import TodoList from './todoList';
+import Input from '../components/input/input';
+import Button from '../components/button/button';
 
-export default function BoardList({
+export default function BoardItem({
   board,
   onDelete,
   onUpdate,
+  dragHandleProps,
+  onAddTodo,
 }: {
   board: BoardInfo;
   onDelete: (id: number) => void;
   onUpdate: (id: number, newTitle: string) => void;
+  onAddTodo: (boardId: number, todo: Todo) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  dragHandleProps?: any;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(board.title);
+
+  const [boardItemTitle, setBoardItemTitle] = useState('');
 
   const handleSave = () => {
     onUpdate(board.id, newTitle);
     setIsEditing(false);
   };
 
+  const addTodo = () => {
+    if (!boardItemTitle.trim()) {
+      alert('할 일을 입력해주세요.');
+      return;
+    }
+    const newTodo = {
+      id: Date.now(),
+      title: boardItemTitle,
+      date: new Date().toLocaleDateString(),
+    };
+
+    onAddTodo(board.id, newTodo);
+    setBoardItemTitle('');
+  };
+
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-md w-1/3">
-      <div className="flex justify-between items-center">
+    <div className="border rounded-lg p-4 bg-white shadow-md">
+      <div className="flex justify-between items-center gap-2">
         {isEditing ? (
           <input
             type="text"
@@ -32,7 +57,9 @@ export default function BoardList({
             className="text-lg font-bold p-2 border rounded-md"
           />
         ) : (
-          <h2 className="text-lg font-bold">{board.title}</h2>
+          <h2 {...dragHandleProps} className="text-lg font-bold cursor-move">
+            {board.title}
+          </h2>
         )}
 
         <div className="flex gap-2">
@@ -55,6 +82,15 @@ export default function BoardList({
             삭제
           </button>
         </div>
+      </div>
+      <hr className="border-t border-gray-300 my-5" />
+      <div className="flex gap-2">
+        <Input
+          value={boardItemTitle}
+          onChange={(e) => setBoardItemTitle(e.target.value)}
+          placeholder="할 일을 입력해주세요."
+        />
+        <Button name="할 일 추가" onClick={addTodo} />
       </div>
       <ul className="mt-2">
         {board.todoList.map((todo) => (
