@@ -6,7 +6,6 @@ export default function TodoList({ todo }: { todo: Todo }) {
   return (
     <li key={todo.id} className="p-2 border-b">
       <p className="font-semibold">{todo.title}</p>
-      <p className="text-sm text-gray-600">{todo.des}</p>
       <p className="text-xs text-gray-500">{todo.date}</p>
     </li>
   );
