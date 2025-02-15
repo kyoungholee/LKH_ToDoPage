@@ -1,9 +1,9 @@
-import TodoList from './view/todoList';
+import BoardList from './view/boardList';
 
 export default function Home() {
   return (
     <>
-      <TodoList />
+      <BoardList />
     </>
   );
 }
