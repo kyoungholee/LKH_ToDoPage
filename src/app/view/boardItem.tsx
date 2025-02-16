@@ -7,6 +7,7 @@ import Input from '../components/input/input';
 import Button from '../components/button/button';
 import TodoList from './todoList';
 import { Todo } from '../typescript/todo';
+import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 
 export default function BoardItem({
   board,
@@ -16,7 +17,8 @@ export default function BoardItem({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   dragHandleProps?: any;
 }) {
-  const { removeBoard, updateBoardTitle, addTodoToBoard } = useBoardStore();
+  const { removeBoard, updateBoardTitle, addTodoToBoard, updateTodoOrder } =
+    useBoardStore();
 
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(board.title);
@@ -40,6 +42,16 @@ export default function BoardItem({
 
     addTodoToBoard(board.id, newTodo);
     setBoardItemTitle('');
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return;
+
+    const { source, destination } = result;
+    if (source.index !== destination.index) {
+      updateTodoOrder(board.id, source.index, destination.index);
+    }
   };
 
   return (
@@ -81,11 +93,28 @@ export default function BoardItem({
         />
         <Button name="할 일 추가" onClick={addTodo} />
       </div>
-      <ul className="mt-2">
-        {board.todoList.map((todo) => (
-          <TodoList key={todo.id} todo={todo} boardId={board.id} />
-        ))}
-      </ul>
+
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId={`board-${board.id}`}>
+          {(provided) => (
+            <ul
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className="mt-2"
+            >
+              {board.todoList.map((todo, index) => (
+                <TodoList
+                  key={todo.id}
+                  todo={todo}
+                  boardId={board.id}
+                  index={index}
+                />
+              ))}
+              {provided.placeholder}
+            </ul>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   );
 }
