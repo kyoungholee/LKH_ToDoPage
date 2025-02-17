@@ -5,6 +5,13 @@ import { Todo } from '../typescript/todo';
 
 interface BoardState {
   boardList: BoardInfo[];
+
+  moveTodo: (
+    sourceBoardId: number,
+    destinationBoardId: number,
+    sourceIndex: number,
+    destinationIndex: number
+  ) => void;
   addBoard: (title: string) => void;
   removeBoard: (id: number) => void;
   updateBoardTitle: (id: number, newTitle: string) => void;
@@ -23,6 +30,36 @@ export const useBoardStore = create<BoardState>()(
   persist(
     (set) => ({
       boardList: [],
+
+      moveTodo: (
+        sourceBoardId,
+        destinationBoardId,
+        sourceIndex,
+        destinationIndex
+      ) => {
+        set((state) => {
+          const sourceBoard = state.boardList.find(
+            (board) => board.id === sourceBoardId
+          );
+          const destinationBoard = state.boardList.find(
+            (board) => board.id === destinationBoardId
+          );
+
+          // 보드가 모두 존재하는지 확인
+          if (!sourceBoard || !destinationBoard) {
+            return state; // 하나라도 없으면 기존 상태 반환
+          }
+
+          const [movedTodo] = sourceBoard.todoList.splice(sourceIndex, 1);
+
+          destinationBoard.todoList.splice(destinationIndex, 0, movedTodo);
+
+          return {
+            ...state,
+            boards: [...state.boardList], // 새로운 boards 배열을 반환
+          };
+        });
+      },
 
       updateTodoOrder: (boardId, startIndex, endIndex) => {
         set((state) => {
@@ -57,9 +94,13 @@ export const useBoardStore = create<BoardState>()(
       },
 
       removeBoard: (id) => {
-        set((state) => ({
-          boardList: state.boardList.filter((board) => board.id !== id),
-        }));
+        const removeConfirm = window.confirm('보드를 지우시겠습니까?');
+
+        if (removeConfirm) {
+          set((state) => ({
+            boardList: state.boardList.filter((board) => board.id !== id),
+          }));
+        }
       },
 
       updateBoardTitle: (id, newTitle) => {
@@ -81,16 +122,22 @@ export const useBoardStore = create<BoardState>()(
       },
 
       removeTodoList: (boardId, todoId) => {
-        set((state) => ({
-          boardList: state.boardList.map((board) =>
-            board.id === boardId
-              ? {
-                  ...board,
-                  todoList: board.todoList.filter((todo) => todo.id !== todoId),
-                }
-              : board
-          ),
-        }));
+        const isItemRemove = window.confirm('할 일 데이터를 지우시겠습니까?');
+
+        if (isItemRemove) {
+          set((state) => ({
+            boardList: state.boardList.map((board) =>
+              board.id === boardId
+                ? {
+                    ...board,
+                    todoList: board.todoList.filter(
+                      (todo) => todo.id !== todoId
+                    ),
+                  }
+                : board
+            ),
+          }));
+        }
       },
 
       modifyTodoList: (boardId, todoId, newTitle) => {
