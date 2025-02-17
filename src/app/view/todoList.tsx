@@ -1,10 +1,8 @@
-'use client';
-
-import { useState } from 'react';
+import { Draggable } from '@hello-pangea/dnd';
 import { Todo } from '../typescript/todo';
 import Input from '../components/input/input';
 import { useBoardStore } from '../store/useBoardStore';
-import { Draggable } from '@hello-pangea/dnd';
+import { useState } from 'react';
 import Image from 'next/image';
 
 export default function TodoList({
@@ -28,13 +26,12 @@ export default function TodoList({
 
   return (
     <Draggable draggableId={`todo-${todo.id}`} index={index}>
-      {/* Draggable 추가 */}
       {(provided) => (
         <li
-          className="p-2 border-b flex justify-between"
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
+          className="p-2 border-b flex justify-between"
         >
           <div>
             {isModify ? (
@@ -48,44 +45,33 @@ export default function TodoList({
             )}
             <p className="text-xs text-gray-500">{todo.date}</p>
           </div>
-          <div className="flex gap-4">
-            <button
-              onClick={() => {
-                if (isModify) {
-                  handleSave();
-                } else {
-                  setIsModify(true);
-                }
-              }}
-              className="text-base px-2 py-1 rounded-md"
-            >
+          <div className="flex gap-4 items-start">
+            <div className="text-base px-2 py-1 rounded-md">
               {isModify ? (
-                <Image
-                  src="/complete.png"
-                  alt="완료 아이콘"
-                  width={20}
-                  height={20}
-                />
+                <button
+                  onClick={() => handleSave()}
+                  className="text-base bg-blue-600 text-white px-2 py-1 rounded-md"
+                >
+                  완료
+                </button>
               ) : (
-                <Image
-                  src="/modify.png"
-                  alt="수정 아이콘"
-                  width={20}
-                  height={20}
-                />
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/modify.png"
+                    alt="수정 아이콘"
+                    width={22}
+                    height={22}
+                    onClick={() => setIsModify(true)}
+                  />
+                  <button
+                    onClick={() => removeTodoList(boardId, todo.id)}
+                    className="text-base bg-red-400 text-white px-2 py-1 rounded-md"
+                  >
+                    삭제
+                  </button>
+                </div>
               )}
-            </button>
-            <button
-              onClick={() => removeTodoList(boardId, todo.id)}
-              className="text-base text-white px-2 py-1 rounded-md"
-            >
-              <Image
-                src="/trash.png"
-                alt="삭제 아이콘"
-                width={20}
-                height={20}
-              />
-            </button>
+            </div>
           </div>
         </li>
       )}

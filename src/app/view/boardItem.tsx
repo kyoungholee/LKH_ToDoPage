@@ -1,25 +1,14 @@
-'use client';
-
-import { useState } from 'react';
+import { Droppable } from '@hello-pangea/dnd';
 import { BoardInfo } from '../typescript/board';
 import { useBoardStore } from '../store/useBoardStore';
 import Input from '../components/input/input';
 import Button from '../components/button/button';
 import TodoList from './todoList';
 import { Todo } from '../typescript/todo';
-import { DragDropContext, Droppable } from '@hello-pangea/dnd';
+import { useState } from 'react';
 
-export default function BoardItem({
-  board,
-  dragHandleProps,
-}: {
-  board: BoardInfo;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  dragHandleProps?: any;
-}) {
-  const { removeBoard, updateBoardTitle, addTodoToBoard, updateTodoOrder } =
-    useBoardStore();
-
+export default function BoardItem({ board }: { board: BoardInfo }) {
+  const { removeBoard, updateBoardTitle, addTodoToBoard } = useBoardStore();
   const [isEditing, setIsEditing] = useState(false);
   const [newTitle, setNewTitle] = useState(board.title);
   const [boardItemTitle, setBoardItemTitle] = useState('');
@@ -44,18 +33,8 @@ export default function BoardItem({
     setBoardItemTitle('');
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const { source, destination } = result;
-    if (source.index !== destination.index) {
-      updateTodoOrder(board.id, source.index, destination.index);
-    }
-  };
-
   return (
-    <div className="border rounded-lg p-4 bg-white shadow-md">
+    <div className="border rounded-lg p-4 bg-slate-50 shadow-md min-h-80">
       <div className="flex justify-between items-center gap-2">
         {isEditing ? (
           <Input
@@ -64,9 +43,7 @@ export default function BoardItem({
             placeholder="입력해주세요."
           />
         ) : (
-          <h2 {...dragHandleProps} className="text-lg font-bold cursor-move">
-            {board.title}
-          </h2>
+          <h2 className="text-lg font-bold cursor-move">{board.title}</h2>
         )}
 
         <div className="flex gap-2">
@@ -94,27 +71,25 @@ export default function BoardItem({
         <Button name="할 일 추가" onClick={addTodo} />
       </div>
 
-      <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId={`board-${board.id}`}>
-          {(provided) => (
-            <ul
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-              className="mt-2"
-            >
-              {board.todoList.map((todo, index) => (
-                <TodoList
-                  key={todo.id}
-                  todo={todo}
-                  boardId={board.id}
-                  index={index}
-                />
-              ))}
-              {provided.placeholder}
-            </ul>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <Droppable droppableId={`board-${board.id}`}>
+        {(provided) => (
+          <ul
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="mt-2"
+          >
+            {board.todoList.map((todo, index) => (
+              <TodoList
+                key={todo.id}
+                todo={todo}
+                boardId={board.id}
+                index={index}
+              />
+            ))}
+            {provided.placeholder}
+          </ul>
+        )}
+      </Droppable>
     </div>
   );
 }
