@@ -68,7 +68,7 @@ export default function BoardList() {
             <div
               ref={provided.innerRef}
               {...provided.droppableProps}
-              className="flex gap-4 flex-wrap overflow-hidden"
+              className="flex gap-4"
             >
               {boardList.map((board, index) => (
                 <Draggable

@@ -34,7 +34,7 @@ export default function BoardItem({ board }: { board: BoardInfo }) {
   };
 
   return (
-    <div className="border rounded-lg p-4 bg-slate-50 shadow-md min-h-80">
+    <div className="border rounded-lg p-4 bg-slate-50 shadow-md min-h-80 w-[340px]">
       <div className="flex justify-between items-center gap-2">
         {isEditing ? (
           <Input
